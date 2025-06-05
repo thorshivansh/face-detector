@@ -174,8 +174,8 @@ video.addEventListener("play", () => {
       const isCentered = diffFromCenter < 40;
       const isStraight = eyeTilt < 10;
 
-      faceapi.draw.drawDetections(canvas, [resized]);
-      faceapi.draw.drawFaceLandmarks(canvas, [resized]);
+      // faceapi.draw.drawDetections(canvas, [resized]);
+      // faceapi.draw.drawFaceLandmarks(canvas, [resized]);
 
       if (isCentered && isStraight) {
         faceAlignedCounter++;
