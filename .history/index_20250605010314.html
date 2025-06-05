@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Face Detection Demo</title>
+  <style>
+    video, canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <video id="video" width="720" height="560" autoplay muted></video>
+  <canvas id="overlay" width="720" height="560"></canvas>
+
+  <!-- ✅ Local script file for FaceAPI -->
+  <script defer src="face-api.js"></script>
+
+  <!-- ✅ Your custom JS file -->
+  <script defer src="camera_capture.js"></script>
+</body>
+</html>

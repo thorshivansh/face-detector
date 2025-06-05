@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Face API Webcam Example</title>
+  <style>
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    video {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <h2>Face detection with FaceAPI.js</h2>
+ <video id="video" width="720" height="560" autoplay muted></video>
+<canvas id="overlay" width="720" height="560"></canvas>
+
+  <!-- Load face-api.js via CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+  <!-- Your script -->
+  <script defer src="camera_capture.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Auto Face Capture</title>
+   <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    canvas, video {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background layer -->
+  <div class="video-container">
+    <video id="video" autoplay muted playsinline></video>
+    <div class="overlay-blur"></div> <!-- Optional: semi-transparent blur -->
+    <canvas id="overlay"></canvas>
+  </div>
+
+
+  <!-- ✅ Load FaceAPI -->
+  <script defer src="face-api.js"></script>
+
+  <!-- ✅ Load script after -->
+  <script defer src="script.js"></script>
+</body>
+</html>

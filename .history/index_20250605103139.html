@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Auto Face Capture</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    canvas, video {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="position: absolute; z-index: 2;">Align your face</h2>
+  <video id="video" width="240" height="480" autoplay muted></video>
+  <canvas id="overlay" width="240" height="480"></canvas>
+
+  <!-- ✅ Load FaceAPI -->
+  <script defer src="face-api.js"></script>
+
+  <!-- ✅ Load script after -->
+  <script defer src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+// const video = document.getElementById("video");
+// const canvas = document.getElementById("overlay");
+// const ctx = canvas.getContext("2d");
+
+// let faceAlignedCounter = 0;
+// const FRAME_THRESHOLD = 10;
+
+// async function start() {
+//   console.log("Loading models...");
+//   await faceapi.nets.tinyFaceDetector.load('/models/');
+//   await faceapi.nets.faceLandmark68Net.load('/models/');
+//   console.log("Models loaded ✅");
+
+//   const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+//   video.srcObject = stream;
+// }
+
+// function drawMask() {
+//   const w = canvas.width;
+//   const h = canvas.height;
+//   ctx.clearRect(0, 0, w, h);
+
+//   // Dark overlay
+//   ctx.fillStyle = 'rgba(0,0,0,0.6)';
+//   ctx.fillRect(0, 0, w, h);
+
+//   // Clear center circle
+//   ctx.globalCompositeOperation = 'destination-out';
+//   ctx.beginPath();
+//   ctx.arc(w/2, h/2, 120, 0, Math.PI * 2, true);
+//   ctx.fill();
+
+//   ctx.globalCompositeOperation = 'source-over';
+//   ctx.strokeStyle = 'lime';
+//   ctx.lineWidth = 2;
+//   ctx.beginPath();
+//   ctx.arc(w/2, h/2, 120, 0, Math.PI * 2, true);
+//   ctx.stroke();
+// }
+
+// function captureImage(detection) {
+//   const box = detection.detection.box;
+//   const captureCanvas = document.createElement("canvas");
+
+//   captureCanvas.width = box.width;
+//   captureCanvas.height = box.height;
+
+//   const captureCtx = captureCanvas.getContext("2d");
+//   captureCtx.drawImage(
+//     video,
+//     box.x, box.y, box.width, box.height,
+//     0, 0, box.width, box.height
+//   );
+
+//   const dataURL = captureCanvas.toDataURL("image/png");
+
+//   // Download direct
+//   const link = document.createElement("a");
+//   link.href = dataURL;
+//   link.download = "captured_face.png";
+//   link.click();
+// }
+
+// video.addEventListener("play", () => {
+//   const displaySize = { width: video.width, height: video.height };
+//   faceapi.matchDimensions(canvas, displaySize);
+
+//   setInterval(async () => {
+//     const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+
+//     drawMask();
+
+//     if (detection) {
+//       const resized = faceapi.resizeResults(detection, displaySize);
+//       const landmarks = resized.landmarks;
+//       const box = resized.detection.box;
+
+//       // Centering logic
+//       const faceCenterX = box.x + box.width / 2;
+//       const diffFromCenter = Math.abs(faceCenterX - canvas.width / 2);
+
+//       const leftEye = landmarks.getLeftEye();
+//       const rightEye = landmarks.getRightEye();
+//       const eyeTilt = Math.abs(leftEye[0].y - rightEye[3].y);
+
+//       const isCentered = diffFromCenter < 40;
+//       const isStraight = eyeTilt < 10;
+
+//     //   faceapi.draw.drawDetections(canvas, [resized]);
+//     //   faceapi.draw.drawFaceLandmarks(canvas, [resized]);
+
+//       if (isCentered && isStraight) {
+//         faceAlignedCounter++;
+//         console.log(`Face aligned: ${faceAlignedCounter}/${FRAME_THRESHOLD}`);
+//       } else {
+//         faceAlignedCounter = 0;
+//       }
+
+//       if (faceAlignedCounter >= FRAME_THRESHOLD) {
+//         console.log("📸 Auto-capturing...");
+//         captureImage(resized);
+//         faceAlignedCounter = 0;
+//       }
+//     } else {
+//       faceAlignedCounter = 0;
+//     }
+//   }, 100);
+// });
+
+// start();
+
+
+
+///
+
+
+
+
+// const video = document.getElementById("video");
+// const canvas = document.getElementById("overlay");
+// const ctx = canvas.getContext("2d");
+
+// let faceAlignedCounter = 0;
+// const REQUIRED_FRAMES = 10;
+
+// async function start() {
+//   await faceapi.nets.tinyFaceDetector.load('/models/');
+//   await faceapi.nets.faceLandmark68Net.load('/models/');
+
+//     // ✅ Force-disable any leftover drawing functions (safety)
+//   faceapi.draw.drawFaceLandmarks = () => {};
+//   faceapi.draw.drawDetections = () => {};
+
+//   const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+//   video.srcObject = stream;
+// }
+
+// function drawMask(isAligned = false) {
+//   const w = canvas.width;
+//   const h = canvas.height;
+//   ctx.clearRect(0, 0, w, h);
+
+//   // Dark transparent overlay
+//   ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+//   ctx.fillRect(0, 0, w, h);
+
+//   ctx.globalCompositeOperation = "destination-out";
+//   ctx.beginPath();
+//   ctx.arc(w / 2, h / 2, 120, 0, Math.PI * 2, true);
+//   ctx.fill();
+//   ctx.globalCompositeOperation = "source-over";
+
+//   // ✅ Circle border turns green if aligned, gray otherwise
+//   ctx.strokeStyle = isAligned ? "lime" : "gray";
+//   ctx.lineWidth = 3;
+//   ctx.beginPath();
+//   ctx.arc(w / 2, h / 2, 120, 0, Math.PI * 2, true);
+//   ctx.stroke();
+// }
+
+// function captureImage(detection) {
+//   const box = detection.detection.box;
+
+//   const headshotCanvas = document.createElement("canvas");
+//   headshotCanvas.width = box.width;
+//   headshotCanvas.height = box.height;
+
+//   const ctx2 = headshotCanvas.getContext("2d");
+//   ctx2.drawImage(
+//     video,
+//     box.x, box.y, box.width, box.height,
+//     0, 0, box.width, box.height
+//   );
+
+//   const dataURL = headshotCanvas.toDataURL("image/png");
+
+//   const link = document.createElement("a");
+//   link.href = dataURL;
+//   link.download = "aligned_headshot.png";
+//   link.click();
+// }
+
+// video.addEventListener("play", () => {
+//   const displaySize = { width: video.width, height: video.height };
+//   faceapi.matchDimensions(canvas, displaySize);
+
+//   setInterval(async () => {
+//     const res = await faceapi
+//       .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+//       .withFaceLandmarks();
+
+//     let isAligned = false;
+
+//     if (res) {
+//       const resized = faceapi.resizeResults(res, displaySize);
+//       const box = resized.detection.box;
+
+//       const faceCenterX = box.x + box.width / 2;
+//       const faceCenterY = box.y + box.height / 2;
+//       const canvasCenterX = canvas.width / 2;
+//       const canvasCenterY = canvas.height / 2;
+
+//       const dx = faceCenterX - canvasCenterX;
+//       const dy = faceCenterY - canvasCenterY;
+//       const distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+//       const isInsideCircle = distanceFromCenter < 100;
+//       const landmarks = resized.landmarks;
+//       const leftEye = landmarks.getLeftEye();
+//       const rightEye = landmarks.getRightEye();
+//       const eyeHeightDiff = Math.abs(leftEye[0].y - rightEye[3].y);
+//       const isLookingStraight = eyeHeightDiff < 10;
+
+//       isAligned = isInsideCircle && isLookingStraight;
+
+//       if (isAligned) {
+//         faceAlignedCounter++;
+//         console.log(`✅ Aligned frame ${faceAlignedCounter}/${REQUIRED_FRAMES}`);
+//       } else {
+//         faceAlignedCounter = 0;
+//       }
+
+//       if (faceAlignedCounter >= REQUIRED_FRAMES) {
+//         console.log("📸 Auto capture fired!");
+//         captureImage(resized);
+//         faceAlignedCounter = 0; // reset
+//       }
+//     } else {
+//       faceAlignedCounter = 0;
+//     }
+
+//     drawMask(isAligned); // update mask color
+//   }, 100);
+// });
+
+// start();
+
+
+///
+
+
+/// face mapping and tracking
+
+// const video = document.getElementById("video");
+// const canvas = document.getElementById("overlay");
+// const ctx = canvas.getContext("2d");
+
+// const SIZE = {
+//   width: window.innerWidth,
+//   height: window.innerHeight,
+// };
+// canvas.width = SIZE.width;
+// canvas.height = SIZE.height;
+
+// async function start() {
+//   // Load FaceAPI models
+//   await faceapi.nets.tinyFaceDetector.load('/models/');
+//   await faceapi.nets.faceLandmark68Net.load('/models/');
+
+//   // Start webcam
+//   const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+//   video.srcObject = stream;
+
+//   // Frame Loop
+//   video.addEventListener("play", () => {
+//     const displaySize = { width: video.videoWidth, height: video.videoHeight };
+//     faceapi.matchDimensions(canvas, SIZE);
+
+//     setInterval(async () => {
+//       const detection = await faceapi
+//         .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+//         .withFaceLandmarks();
+
+//       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+//       if (detection) {
+//         const resized = faceapi.resizeResults(detection, SIZE);
+
+//         drawCornerBrackets(resized.detection.box);
+//         drawFaceWireframe(resized.landmarks);
+//       }
+//     }, 100);
+//   });
+// }
+
+// function drawCornerBrackets(box) {
+//   const { x, y, width, height } = box;
+//   ctx.strokeStyle = "yellow";
+//   ctx.lineWidth = 3;
+
+//   const len = 30;
+
+//   ctx.beginPath();
+//   // Top-left
+//   ctx.moveTo(x, y + len);
+//   ctx.lineTo(x, y);
+//   ctx.lineTo(x + len, y);
+//   // Top-right
+//   ctx.moveTo(x + width - len, y);
+//   ctx.lineTo(x + width, y);
+//   ctx.lineTo(x + width, y + len);
+//   // Bottom-right
+//   ctx.moveTo(x + width, y + height - len);
+//   ctx.lineTo(x + width, y + height);
+//   ctx.lineTo(x + width - len, y + height);
+//   // Bottom-left
+//   ctx.moveTo(x + len, y + height);
+//   ctx.lineTo(x, y + height);
+//   ctx.lineTo(x, y + height - len);
+
+//   ctx.stroke();
+// }
+
+// function drawFaceWireframe(landmarks) {
+//   ctx.strokeStyle = "cyan";
+//   ctx.lineWidth = 1;
+
+//   const points = landmarks.positions;
+
+//   // Optional: Connect specific regions (eyes, mouth, nose)
+//   const connect = (indices) => {
+//     ctx.beginPath();
+//     indices.forEach((i, idx) => {
+//       const pt = points[i];
+//       if (idx === 0) {
+//         ctx.moveTo(pt.x, pt.y);
+//       } else {
+//         ctx.lineTo(pt.x, pt.y);
+//       }
+//     });
+//     ctx.stroke();
+//   };
+
+//   // Jawline
+//   connect([...Array(17).keys()]); // 0-16
+//   // Left eyebrow
+//   connect([17, 18, 19, 20, 21]);
+//   // Right eyebrow
+//   connect([22, 23, 24, 25, 26]);
+//   // Nose bridge
+//   connect([27, 28, 29, 30]);
+//   // Nose base
+//   connect([31, 32, 33, 34, 35]);
+//   // Eyes and mouth
+//   connect([36, 37, 38, 39, 40, 41, 36]); // left eye
+//   connect([42, 43, 44, 45, 46, 47, 42]); // right eye
+//   connect([48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 48]); // outer mouth
+//   connect([60, 61, 62, 63, 64, 65, 66, 67, 60]); // inner mouth
+// }
+
+// start();
+
+
+
+//
+const video = document.getElementById("video");
+const canvas = document.getElementById("overlay");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let faceAlignedCounter = 0;
+const REQUIRED_FRAMES = 10;
+
+// Fixed frame (e.g., 300x400px center)
+const FRAME_WIDTH = 300;
+const FRAME_HEIGHT = 400;
+const FRAME_X = (canvas.width - FRAME_WIDTH) / 2;
+const FRAME_Y = (canvas.height - FRAME_HEIGHT) / 2;
+
+async function start() {
+  await faceapi.nets.tinyFaceDetector.load("/models/");
+  await faceapi.nets.faceLandmark68Net.load("/models/");
+
+  faceapi.draw.drawFaceDetections = () => {};
+  faceapi.draw.drawFaceLandmarks = () => {};
+
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  video.srcObject = stream;
+}
+
+function drawFixedFrame(isAligned = false) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Overlay
+  ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Clear middle
+  ctx.clearRect(FRAME_X, FRAME_Y, FRAME_WIDTH, FRAME_HEIGHT);
+
+  // Draw corner brackets
+  const len = 30;
+  ctx.strokeStyle = isAligned ? "lime" : "yellow";
+  ctx.lineWidth = 3;
+
+  ctx.beginPath();
+  // TL
+  ctx.moveTo(FRAME_X, FRAME_Y + len);
+  ctx.lineTo(FRAME_X, FRAME_Y);
+  ctx.lineTo(FRAME_X + len, FRAME_Y);
+  // TR
+  ctx.moveTo(FRAME_X + FRAME_WIDTH - len, FRAME_Y);
+  ctx.lineTo(FRAME_X + FRAME_WIDTH, FRAME_Y);
+  ctx.lineTo(FRAME_X + FRAME_WIDTH, FRAME_Y + len);
+  // BR
+  ctx.moveTo(FRAME_X + FRAME_WIDTH, FRAME_Y + FRAME_HEIGHT - len);
+  ctx.lineTo(FRAME_X + FRAME_WIDTH, FRAME_Y + FRAME_HEIGHT);
+  ctx.lineTo(FRAME_X + FRAME_WIDTH - len, FRAME_Y + FRAME_HEIGHT);
+  // BL
+  ctx.moveTo(FRAME_X + len, FRAME_Y + FRAME_HEIGHT);
+  ctx.lineTo(FRAME_X, FRAME_Y + FRAME_HEIGHT);
+  ctx.lineTo(FRAME_X, FRAME_Y + FRAME_HEIGHT - len);
+
+  ctx.stroke();
+}
+
+function cropPassportPhoto() {
+  const hiddenCanvas = document.createElement("canvas");
+  hiddenCanvas.width = FRAME_WIDTH;
+  hiddenCanvas.height = FRAME_HEIGHT;
+
+  const ctx2 = hiddenCanvas.getContext("2d");
+  ctx2.drawImage(
+    video,
+    FRAME_X, FRAME_Y, FRAME_WIDTH, FRAME_HEIGHT,
+    0, 0, FRAME_WIDTH, FRAME_HEIGHT
+  );
+
+  const dataURL = hiddenCanvas.toDataURL("image/png");
+  const link = document.createElement("a");
+  link.href = dataURL;
+  link.download = "passport_photo.png";
+  link.click();
+}
+
+video.addEventListener("play", () => {
+  const displaySize = { width: video.videoWidth, height: video.videoHeight };
+  faceapi.matchDimensions(canvas, displaySize);
+
+  setInterval(async () => {
+    const detection = await faceapi
+      .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks();
+
+    let isAligned = false;
+
+    if (detection) {
+      const resized = faceapi.resizeResults(detection, {
+        width: canvas.width,
+        height: canvas.height,
+      });
+
+      const box = resized.detection.box;
+
+      // Check if face box is inside fixed frame
+      const faceCenterX = box.x + box.width / 2;
+      const faceCenterY = box.y + box.height / 2;
+      const isInsideX = faceCenterX > FRAME_X && faceCenterX < FRAME_X + FRAME_WIDTH;
+      const isInsideY = faceCenterY > FRAME_Y && faceCenterY < FRAME_Y + FRAME_HEIGHT;
+      const isInsideBox = isInsideX && isInsideY;
+
+      // Check if looking straight
+      const landmarks = resized.landmarks;
+      const leftEye = landmarks.getLeftEye();
+      const rightEye = landmarks.getRightEye();
+      const eyeTilt = Math.abs(leftEye[0].y - rightEye[3].y);
+      const isStraight = eyeTilt < 10;
+
+      isAligned = isInsideBox && isStraight;
+
+      if (isAligned) {
+        faceAlignedCounter++;
+        console.log(`✅ Face aligned: ${faceAlignedCounter}/${REQUIRED_FRAMES}`);
+      } else {
+        faceAlignedCounter = 0;
+      }
+
+      if (faceAlignedCounter >= REQUIRED_FRAMES) {
+        console.log("📸 Capturing passport photo...");
+        cropPassportPhoto();
+        faceAlignedCounter = 0;
+      }
+    } else {
+      faceAlignedCounter = 0;
+    }
+
+    drawFixedFrame(isAligned);
+  }, 100);
+});
+
+start();
